@@ -20,6 +20,7 @@ add_executable(
   base64_test
   test/base64_test.cpp
 )
+
 target_link_libraries(
   base64_test
   GTest::gtest_main
