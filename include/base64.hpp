@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <stdexcept>
 
 namespace base64
 {
@@ -107,7 +108,7 @@ namespace base64
         if (input_string.size() % 4 != 0)
         {
             throw std::runtime_error{
-                "Invalid base64 data"};
+                "Invalid base64 data. Couldn't resolve ammount of symbols."};
         }
 
         // Size of input string //
@@ -116,8 +117,14 @@ namespace base64
         // Ammount of paddings in input string //
         const size_t numPadding = std::count(input_string.rbegin(), input_string.rbegin() + 4, '=');
 
+        if (numPadding > 2)
+        {
+            throw std::runtime_error{
+                "Invalid base64 string. Couldn't resolve ammount of paddinngs."};
+        }
+
         // Calculate and reserve place for decoded string //
-        size_t size_decoded = (in_data_size * 3 >> 2) - numPadding;
+        size_t size_decoded = (in_data_size / 4 * 3) - numPadding;
         std::string decoded_string;
         decoded_string.reserve(size_decoded);
 

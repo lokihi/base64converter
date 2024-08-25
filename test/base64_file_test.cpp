@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
 
 #include "../include/base64.hpp"
-#include <string>
+
 #include <fstream>
+#include <sstream>
+#include <string>
+
 
 TEST(base64_encode_decode, Exe_File)
 {
