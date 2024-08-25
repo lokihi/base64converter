@@ -17,14 +17,25 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-  base64_test
+  base64_basic_test
   test/base64_test.cpp
+) 
+
+add_executable(
+  base64_file_test
+  test/base64_file_test.cpp
+) 
+
+target_link_libraries(
+  base64_basic_test
+  GTest::gtest_main
 )
 
 target_link_libraries(
-  base64_test
+  base64_file_test
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(base64_test)
+gtest_discover_tests(base64_basic_test)
+gtest_discover_tests(base64_file_test)
