@@ -119,18 +119,13 @@ inline std::string decode(std::string_view inputString)
         return std::string{};
     }
 
-    // Check, if ammount of symbols in input string is divisible by 4 //
-    if (inputString.size() % 4 != 0)
-    {
-        throw std::runtime_error{
-            "Invalid base64 data. Couldn't resolve ammount of symbols."};
-    }
-
     // Size of input string //
     const size_t inputDataSize = inputString.size();
 
     // Ammount of paddings in input string //
     const size_t numPadding = std::count(inputString.rbegin(), inputString.rbegin() + 4, '=');
+    const size_t numNewLine = std::count(inputString.begin(), inputString.end(), '\n');
+    const size_t numReturn = std::count(inputString.begin(), inputString.end(), '\r');
 
     // Check, if ammount of padding symbols is correct (< 2) //
     if (numPadding > 2)
@@ -145,23 +140,25 @@ inline std::string decode(std::string_view inputString)
     decodedString.reserve(sizeDecoded);
 
     // Storing pointer to currently decoded symbol in input string //
-    const uint8_t *inputIterator = reinterpret_cast<const uint8_t *>(&inputString[0]);
+    const uint8_t *inputIterator = reinterpret_cast<const uint8_t *>(&inputString[0]);    
+
+    uint8_t currentBlock[4];
+    int counterBlock = 0;
 
     // Iterate over blocks of 4 until the end of the input string //
-    for (size_t i = (inputDataSize - numPadding) / 4; i; --i)
-    {
-
-        const uint8_t symbol1 = *inputIterator++;
-        const uint8_t symbol2 = *inputIterator++;
-        const uint8_t symbol3 = *inputIterator++;
-        const uint8_t symbol4 = *inputIterator++;
-
+    for (size_t i = 0; i < inputDataSize - (numPadding!=0)*4; i++)
+    {   
+        currentBlock[counterBlock] = *inputIterator++;
+        if (currentBlock[counterBlock] != '\n' && currentBlock[counterBlock]!='\r') counterBlock++;
+        if (counterBlock == 4)
+        {
         std::uint32_t const concatenatedBits =
-            (decodeTable[symbol1] << 18) | (decodeTable[symbol2] << 12) | (decodeTable[symbol3] << 6) | decodeTable[symbol4];
-
+            (decodeTable[currentBlock[0]] << 18) | (decodeTable[currentBlock[1]] << 12) | (decodeTable[currentBlock[2]] << 6) | decodeTable[currentBlock[3]];
         decodedString.push_back((concatenatedBits >> 16) & 0b1111'1111);
         decodedString.push_back((concatenatedBits >> 8) & 0b1111'1111);
         decodedString.push_back(concatenatedBits & 0b1111'1111);
+        counterBlock = 0;
+        }
     }
 
     // Work with end of the base64 encoded string //
