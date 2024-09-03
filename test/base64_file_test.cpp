@@ -8,7 +8,7 @@
 
 TEST(base64_encode_decode, Exe_File)
 {
-    std::ifstream t("resources/test.exe");
+    std::ifstream t("../resources/test.exe");
     std::stringstream buffer;
     buffer << t.rdbuf();
     std::string const expected{buffer.str()};
@@ -18,7 +18,7 @@ TEST(base64_encode_decode, Exe_File)
 
 TEST(base64_encode_decode, UTF8_File)
 {
-    std::ifstream t("resources/UTF-8.txt");
+    std::ifstream t("../resources/UTF-8.txt");
     std::stringstream buffer;
     buffer << t.rdbuf();
     std::string const expected{buffer.str()};
@@ -28,7 +28,7 @@ TEST(base64_encode_decode, UTF8_File)
 
 TEST(base64_encode_decode, CP1251_File)
 {
-    std::ifstream t("resources/cp-1251.txt");
+    std::ifstream t("../resources/cp-1251.txt");
     std::stringstream buffer;
     buffer << t.rdbuf();
     std::string const expected{buffer.str()};
@@ -38,7 +38,7 @@ TEST(base64_encode_decode, CP1251_File)
 
 TEST(base64_encode_decode, mailFile)
 {
-    std::ifstream t("resources/mailFile.txt");
+    std::ifstream t("../resources/mailFile.txt");
     std::stringstream buffer;
     buffer << t.rdbuf();
     std::string const expected{buffer.str()};
