@@ -44,4 +44,4 @@ TEST(base64_encode_decode, mailFile)
     std::string const expected{buffer.str()};
     std::string const actual{base64::decode({base64::encode({buffer.str()})})};
     ASSERT_EQ(expected, actual);
-}  
+}

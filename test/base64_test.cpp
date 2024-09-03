@@ -3,7 +3,6 @@
 #include "../include/base64.hpp"
 #include <string>
 
-// TEST FOR EMPTY INPUT //
 TEST(base64encode, InputEmpty)
 {
     std::string const expected{};
@@ -11,7 +10,6 @@ TEST(base64encode, InputEmpty)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR SINGLE SYMBOL INPUT STRING //
 TEST(base64encode, SingleSymbolInput)
 {
     std::string const expected{"bw=="};
@@ -19,7 +17,6 @@ TEST(base64encode, SingleSymbolInput)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR TWO SYMBOL INPUT STRING //
 TEST(base64encode, DoubleSymbolInput)
 {
     std::string const expected{"b2s="};
@@ -27,7 +24,6 @@ TEST(base64encode, DoubleSymbolInput)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR TRIPLE SYMBOL INPUT STRING //
 TEST(base64encode, TripleSymbolInput)
 {
     std::string const expected{"b2tp"};
@@ -35,7 +31,6 @@ TEST(base64encode, TripleSymbolInput)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR LONG STRING //
 TEST(base64encode, LongInput)
 {
     std::string const expected{"YmFzZTY0IGVuY29kZXI="};
@@ -43,7 +38,6 @@ TEST(base64encode, LongInput)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR REALY LONG STRING //
 TEST(base64encode, RealyLongInput)
 {
     std::string const expected{"VGhpcyBpcyBhIHJlYWxseSBsb25nIHN0cmluZyB0byB0ZXN0IHRoaXMgYWJzb2x1dGVseSBiZWF1dGlmdWwgYmFzZTY0IGVuY29kZXI="};
@@ -51,7 +45,6 @@ TEST(base64encode, RealyLongInput)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR EMPTY OUTPUT //
 TEST(base64decode, OutputEmpty)
 {
     std::string const expected{};
@@ -59,7 +52,6 @@ TEST(base64decode, OutputEmpty)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR SINGLE SYMBOL OUTPUT STRING //
 TEST(base64decode, SingleSymbolOutput)
 {
     std::string const expected{"o"};
@@ -67,7 +59,6 @@ TEST(base64decode, SingleSymbolOutput)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR TWO SYMBOL OUTPUT STRING //
 TEST(base64decode, DoubleSymbolOutput)
 {
     std::string const expected{"ok"};
@@ -75,7 +66,6 @@ TEST(base64decode, DoubleSymbolOutput)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR TRIPLE SYMBOL OUTPUT STRING //
 TEST(base64decode, TripleSymbolOutput)
 {
     std::string const expected{"oki"};
@@ -83,7 +73,6 @@ TEST(base64decode, TripleSymbolOutput)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR LONG STRING //
 TEST(base64decode, LongOutput)
 {
     std::string const expected{"base64 encoder"};
@@ -91,7 +80,6 @@ TEST(base64decode, LongOutput)
     ASSERT_EQ(expected, actual);
 }
 
-// TEST FOR REALY LONG STRING //
 TEST(base64decode, RealyLongOutput)
 {
     std::string const expected{"This is a really long string to test this absolutely beautiful base64 encoder"};
