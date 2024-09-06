@@ -13,7 +13,6 @@ namespace base64
 namespace detail
 {
 
-// Encoding table for base64 converter //
 constexpr std::array<char, 64> encodeTable
 {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 
@@ -26,7 +25,6 @@ constexpr std::array<char, 64> encodeTable
     '4', '5', '6', '7', '8', '9', '+', '/'
 };
 
-// Decoding table for base 64 converter //
 constexpr std::array<std::uint8_t, 256> decodeTable
 {
     0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
@@ -49,9 +47,12 @@ constexpr std::array<std::uint8_t, 256> decodeTable
 
 inline void encodingMainPartString(std::string_view inputString, std::string &outputString)
 {
+    const size_t sizeEncoded = (inputString.size() + 2) / 3 * 4;
+    outputString.reserve(sizeEncoded);
+
     const uint8_t *inputIterator = reinterpret_cast<const uint8_t *>(&inputString[0]);
 
-    for (size_t i = 0; i < inputString.size() / 3; i++)
+    for (size_t i = 0; i < inputString.size() / 3; ++i)
     {
         const uint8_t symbol1 = *inputIterator++;
         const uint8_t symbol2 = *inputIterator++;
@@ -70,11 +71,11 @@ inline void encodingAddPaddingChar(std::string_view inputString, std::string &ou
 {
     switch (inputString.size() % 3)
     {
-    case 0:
+    case 0: // Zero padding chars need to be added to encoded string
     {
         break;
     }
-    case 1:
+    case 1: // One padding char need to be added to encoded string
     {
         const uint8_t sym = inputString.back();
         outputString.push_back(encodeTable[(sym >> 2) & 0b0011'1111]);
@@ -83,7 +84,7 @@ inline void encodingAddPaddingChar(std::string_view inputString, std::string &ou
         outputString.push_back('=');
         break;
     }
-    case 2:
+    case 2: // Two padding chars need to be added to encoded string
     {
         const uint8_t symbol1 = inputString.at(inputString.size()-2);
         const uint8_t symbol2 = inputString.back();
@@ -93,11 +94,18 @@ inline void encodingAddPaddingChar(std::string_view inputString, std::string &ou
         outputString.push_back('=');
         break;
     }
+    default:
+    {
+        break;
+    }
     }
 }
 
 inline void decodingMainPartString(std::string_view inputString, int numPadding, std::string &outputString)
 {
+    const size_t sizeDecoded = (inputString.size() / 4 * 3) - numPadding;
+    outputString.reserve(sizeDecoded);
+
     const uint8_t *inputIterator = reinterpret_cast<const uint8_t *>(&inputString[0]);    
 
     uint8_t currentBlock[4];
@@ -105,14 +113,15 @@ inline void decodingMainPartString(std::string_view inputString, int numPadding,
 
     size_t blocksAmmount = inputString.size() - (numPadding!=0)*4;
 
-    for (size_t i = 0; i < blocksAmmount; i++)
+    for (size_t i = 0; i < blocksAmmount; ++i)
     {   
         currentBlock[counterBlock] = *inputIterator++;
-        if (currentBlock[counterBlock] != '\n' && currentBlock[counterBlock]!='\r') counterBlock++;
+        if (currentBlock[counterBlock] != '\n' && currentBlock[counterBlock]!='\r') 
+        counterBlock++;
         if (counterBlock == 4)
         {
-        std::uint32_t const concatenatedBits =
-            (decodeTable[currentBlock[0]] << 18) | (decodeTable[currentBlock[1]] << 12) | (decodeTable[currentBlock[2]] << 6) | decodeTable[currentBlock[3]];
+        std::uint32_t const concatenatedBits = (decodeTable[currentBlock[0]] << 18) | (decodeTable[currentBlock[1]] << 12) |
+            (decodeTable[currentBlock[2]] << 6) | decodeTable[currentBlock[3]];
         outputString.push_back((concatenatedBits >> 16) & 0b1111'1111);
         outputString.push_back((concatenatedBits >> 8) & 0b1111'1111);
         outputString.push_back(concatenatedBits & 0b1111'1111);
@@ -155,6 +164,11 @@ inline void decodingPaddingChar(std::string_view inputString, int numPadding, st
 
         break;
     }
+    default:
+    {
+        break;
+    }
+    
     }
 }
 } // namespace detail
@@ -163,10 +177,7 @@ inline std::string encode(std::string_view inputString)
 {
     const size_t inputDataSize = inputString.size();
 
-    const size_t sizeEncoded = (inputDataSize + 2) / 3 * 4;
-
     std::string encodedString;
-    encodedString.reserve(sizeEncoded);
 
     detail::encodingMainPartString(inputString, encodedString);
 
@@ -175,8 +186,6 @@ inline std::string encode(std::string_view inputString)
     return encodedString;
 }
 
-
-
 inline std::string decode(std::string_view inputString)
 {
     if (inputString.empty())
@@ -184,7 +193,15 @@ inline std::string decode(std::string_view inputString)
         return std::string{};
     }
 
+    const size_t ammountNewline = std::count(inputString.begin(), inputString.end(), '\n');    
     const size_t inputDataSize = inputString.size();
+
+    if ((inputDataSize-ammountNewline)%4!=0)
+    {
+        throw std::runtime_error{
+            "Invalid base64 string. Ammount of characters not divisible by 4."};
+    }
+
     const size_t numPadding = std::count(inputString.rbegin(), inputString.rbegin() + 4, '=');
 
     if (numPadding > 2)
@@ -193,12 +210,39 @@ inline std::string decode(std::string_view inputString)
             "Invalid base64 string. Couldn't resolve ammount of paddinngs."};
     }
 
-    const size_t sizeDecoded = (inputDataSize / 4 * 3) - numPadding;
-
     std::string decodedString;
-    decodedString.reserve(sizeDecoded);
 
     detail::decodingMainPartString(inputString, numPadding, decodedString);
+
+    detail::decodingPaddingChar(inputString, numPadding, decodedString);
+
+    return decodedString;
+}
+
+inline std::string decode(std::string_view inputString, bool& isOk)
+{
+    isOk = true;
+
+    if (inputString.empty())
+    {
+        return std::string{};
+    }
+
+    const size_t ammountNewline = std::count(inputString.begin(), inputString.end(), '\n');    
+    const size_t inputDataSize = inputString.size();
+
+    if ((inputDataSize-ammountNewline)%4!=0)
+        isOk = false;
+
+    const size_t numPadding = std::count(inputString.rbegin(), inputString.rbegin() + 4, '=');
+
+    if (numPadding > 2)
+        isOk = false;
+
+    std::string decodedString;
+
+    detail::decodingMainPartString(inputString, numPadding, decodedString);
+
     detail::decodingPaddingChar(inputString, numPadding, decodedString);
 
     return decodedString;
