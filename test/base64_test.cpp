@@ -1,88 +1,88 @@
-#include <gtest/gtest.h>
-
 #include "../include/base64.hpp"
+
+#include <gtest/gtest.h>
 #include <string>
 
 TEST(base64encode, InputEmpty)
 {
-    std::string const expected{};
-    std::string const actual{base64::encode({})};
+    const std::string expected{};
+    const std::string actual{base64::encode({})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64encode, SingleSymbolInput)
 {
-    std::string const expected{"bw=="};
-    std::string const actual{base64::encode({"o"})};
+    const std::string expected{"bw=="};
+    const std::string actual{base64::encode({"o"})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64encode, DoubleSymbolInput)
 {
-    std::string const expected{"b2s="};
-    std::string const actual{base64::encode({"ok"})};
+    const std::string expected{"b2s="};
+    const std::string actual{base64::encode({"ok"})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64encode, TripleSymbolInput)
 {
-    std::string const expected{"b2tp"};
-    std::string const actual{base64::encode({"oki"})};
+    const std::string expected{"b2tp"};
+    const std::string actual{base64::encode({"oki"})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64encode, LongInput)
 {
-    std::string const expected{"YmFzZTY0IGVuY29kZXI="};
-    std::string const actual{base64::encode({"base64 encoder"})};
+    const std::string expected{"YmFzZTY0IGVuY29kZXI="};
+    const std::string actual{base64::encode({"base64 encoder"})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64encode, RealyLongInput)
 {
-    std::string const expected{"VGhpcyBpcyBhIHJlYWxseSBsb25nIHN0cmluZyB0byB0ZXN0IHRoaXMgYWJzb2x1dGVseSBiZWF1dGlmdWwgYmFzZTY0IGVuY29kZXI="};
-    std::string const actual{base64::encode({"This is a really long string to test this absolutely beautiful base64 encoder"})};
+    const std::string expected{"VGhpcyBpcyBhIHJlYWxseSBsb25nIHN0cmluZyB0byB0ZXN0IHRoaXMgYWJzb2x1dGVseSBiZWF1dGlmdWwgYmFzZTY0IGVuY29kZXI="};
+    const std::string actual{base64::encode({"This is a really long string to test this absolutely beautiful base64 encoder"})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64decode, OutputEmpty)
 {
-    std::string const expected{};
-    std::string const actual{base64::decode({})};
+    const std::string expected{};
+    const std::string actual{base64::decode({})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64decode, SingleSymbolOutput)
 {
-    std::string const expected{"o"};
-    std::string const actual{base64::decode({"bw=="})};
+    const std::string expected{"o"};
+    const std::string actual{base64::decode({"bw=="})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64decode, DoubleSymbolOutput)
 {
-    std::string const expected{"ok"};
-    std::string const actual{base64::decode({"b2s="})};
+    const std::string expected{"ok"};
+    const std::string actual{base64::decode({"b2s="})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64decode, TripleSymbolOutput)
 {
-    std::string const expected{"oki"};
-    std::string const actual{base64::decode({"b2tp"})};
+    const std::string expected{"oki"};
+    const std::string actual{base64::decode({"b2tp"})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64decode, LongOutput)
 {
-    std::string const expected{"base64 encoder"};
-    std::string const actual{base64::decode({"YmFzZTY0IGVuY29kZXI="})};
+    const std::string expected{"base64 encoder"};
+    const std::string actual{base64::decode({"YmFzZTY0IGVuY29kZXI="})};
     ASSERT_EQ(expected, actual);
 }
 
 TEST(base64decode, RealyLongOutput)
 {
-    std::string const expected{"This is a really long string to test this absolutely beautiful base64 encoder"};
-    std::string const actual{base64::decode({"VGhpcyBpcyBhIHJlYWxseSBsb25nIHN0cmluZyB0byB0ZXN0IHRoaXMgYWJzb2x1dGVseSBiZWF1dGlmdWwgYmFzZTY0IGVuY29kZXI="})};
+    const std::string expected{"This is a really long string to test this absolutely beautiful base64 encoder"};
+    const std::string actual{base64::decode({"VGhpcyBpcyBhIHJlYWxseSBsb25nIHN0cmluZyB0byB0ZXN0IHRoaXMgYWJzb2x1dGVseSBiZWF1dGlmdWwgYmFzZTY0IGVuY29kZXI="})};
     ASSERT_EQ(expected, actual);
 }
