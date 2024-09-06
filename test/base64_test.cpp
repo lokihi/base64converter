@@ -86,3 +86,35 @@ TEST(base64decode, RealyLongOutput)
     const std::string actual{base64::decode({"VGhpcyBpcyBhIHJlYWxseSBsb25nIHN0cmluZyB0byB0ZXN0IHRoaXMgYWJzb2x1dGVseSBiZWF1dGlmdWwgYmFzZTY0IGVuY29kZXI="})};
     ASSERT_EQ(expected, actual);
 }
+
+TEST(base64decode, FlagErrorAmmountOfSymbols)
+{
+    const bool expected{false};
+    bool flag;
+    const std::string decoded{base64::decode({"123"},flag)};
+    ASSERT_EQ(expected, flag);
+}
+
+TEST(base64decode, FlagErrorNumPadding)
+{
+    const bool expected{false};
+    bool flag;
+    const std::string decoded{base64::decode({"12345==="},flag)};
+    ASSERT_EQ(expected, flag);
+}
+
+TEST(base64decode, FlagCorrectAmmountOfSymbols)
+{
+    const bool expected{true};
+    bool flag;
+    const std::string decoded{base64::decode({"1234"},flag)};
+    ASSERT_EQ(expected, flag);
+}
+
+TEST(base64decode, FlagCorrectNumPadding)
+{
+    const bool expected{true};
+    bool flag;
+    const std::string decoded{base64::decode({"123456=="},flag)};
+    ASSERT_EQ(expected, flag);
+}
