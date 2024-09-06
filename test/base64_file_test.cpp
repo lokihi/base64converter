@@ -11,6 +11,7 @@ TEST(base64_encode_decode, Exe_File)
     std::stringstream buffer;
     buffer << t.rdbuf();
     const std::string expected{buffer.str()};
+    ASSERT_EQ(expected.empty(), false);
     const std::string actual{base64::decode({base64::encode({buffer.str()})})};
     ASSERT_EQ(expected, actual);
 }   
@@ -21,6 +22,7 @@ TEST(base64_encode_decode, UTF8_File)
     std::stringstream buffer;
     buffer << t.rdbuf();
     const std::string expected{buffer.str()};
+    ASSERT_EQ(expected.empty(), false);
     const std::string actual{base64::decode({base64::encode({buffer.str()})})};
     ASSERT_EQ(expected, actual);
 }   
@@ -31,6 +33,7 @@ TEST(base64_encode_decode, CP1251_File)
     std::stringstream buffer;
     buffer << t.rdbuf();
     const std::string expected{buffer.str()};
+    ASSERT_EQ(expected.empty(), false);
     const std::string actual{base64::decode({base64::encode({buffer.str()})})};
     ASSERT_EQ(expected, actual);
 }   
@@ -41,6 +44,7 @@ TEST(base64_encode_decode, mailFile)
     std::stringstream buffer;
     buffer << t.rdbuf();
     const std::string expected{buffer.str()};
+    ASSERT_EQ(expected.empty(), false);
     const std::string actual{base64::decode({base64::encode({buffer.str()})})};
     ASSERT_EQ(expected, actual);
 }
