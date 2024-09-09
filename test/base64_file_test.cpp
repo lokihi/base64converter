@@ -1,6 +1,7 @@
 #include "../include/base64.hpp"
 
 #include <gtest/gtest.h>
+
 #include <fstream>
 #include <sstream>
 #include <string>

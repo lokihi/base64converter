@@ -1,6 +1,7 @@
 #include "../include/base64.hpp"
 
 #include <gtest/gtest.h>
+
 #include <string>
 
 TEST(base64encode, InputEmpty)
@@ -89,32 +90,28 @@ TEST(base64decode, RealyLongOutput)
 
 TEST(base64decode, FlagErrorAmmountOfSymbols)
 {
-    const bool expected{false};
     bool flag;
-    const std::string decoded{base64::decode({"123"},flag)};
-    ASSERT_EQ(expected, flag);
+    const std::string decoded{base64::decode({"123"}, flag)};
+    ASSERT_FALSE(flag);
 }
 
 TEST(base64decode, FlagErrorNumPadding)
 {
-    const bool expected{false};
     bool flag;
-    const std::string decoded{base64::decode({"12345==="},flag)};
-    ASSERT_EQ(expected, flag);
+    const std::string decoded{base64::decode({"12345==="}, flag)};
+    ASSERT_FALSE(flag);
 }
 
 TEST(base64decode, FlagCorrectAmmountOfSymbols)
 {
-    const bool expected{true};
     bool flag;
     const std::string decoded{base64::decode({"1234"},flag)};
-    ASSERT_EQ(expected, flag);
+    ASSERT_TRUE(flag);
 }
 
 TEST(base64decode, FlagCorrectNumPadding)
 {
-    const bool expected{true};
     bool flag;
     const std::string decoded{base64::decode({"123456=="},flag)};
-    ASSERT_EQ(expected, flag);
+    ASSERT_TRUE(flag);
 }
