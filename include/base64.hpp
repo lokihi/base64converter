@@ -58,7 +58,7 @@ inline void encodingMainPartString(std::string_view inputString, std::string &ou
         const uint8_t symbol2 = *inputIterator++;
         const uint8_t symbol3 = *inputIterator++;
 
-        std::uint32_t const concatenatedBits = (symbol1 << 16) | (symbol2 << 8) | symbol3;
+        const std::uint32_t concatenatedBits = (symbol1 << 16) | (symbol2 << 8) | symbol3;
 
         outputString.push_back(encodeTable[(concatenatedBits >> 18) & 0b0011'1111]);
         outputString.push_back(encodeTable[(concatenatedBits >> 12) & 0b0011'1111]);
@@ -101,7 +101,7 @@ inline void encodingAddPaddingChar(std::string_view inputString, std::string &ou
     }
 }
 
-inline void decodingMainPartString(std::string_view inputString, int numPadding, std::string &outputString)
+inline void decodingMainPartString(std::string_view inputString, size_t numPadding, std::string &outputString)
 {
     const size_t sizeDecoded = (inputString.size() / 4 * 3) - numPadding;
     outputString.reserve(sizeDecoded);
@@ -117,34 +117,34 @@ inline void decodingMainPartString(std::string_view inputString, int numPadding,
     {   
         currentBlock[counterBlock] = *inputIterator++;
         if (currentBlock[counterBlock] != '\n' && currentBlock[counterBlock]!='\r') 
-        counterBlock++;
+            counterBlock++;
         if (counterBlock == 4)
         {
-        std::uint32_t const concatenatedBits = (decodeTable[currentBlock[0]] << 18) | (decodeTable[currentBlock[1]] << 12) |
-            (decodeTable[currentBlock[2]] << 6) | decodeTable[currentBlock[3]];
-        outputString.push_back((concatenatedBits >> 16) & 0b1111'1111);
-        outputString.push_back((concatenatedBits >> 8) & 0b1111'1111);
-        outputString.push_back(concatenatedBits & 0b1111'1111);
-        counterBlock = 0;
+            const std::uint32_t concatenatedBits = (decodeTable[currentBlock[0]] << 18) | 
+                (decodeTable[currentBlock[1]] << 12) | (decodeTable[currentBlock[2]] << 6) | decodeTable[currentBlock[3]];
+            outputString.push_back((concatenatedBits >> 16) & 0b1111'1111);
+            outputString.push_back((concatenatedBits >> 8) & 0b1111'1111);
+            outputString.push_back(concatenatedBits & 0b1111'1111);
+            counterBlock = 0;
         }
     }
 }
 
-inline void decodingPaddingChar(std::string_view inputString, int numPadding, std::string &outputString)
+inline void decodingPaddingChar(std::string_view inputString, size_t numPadding, std::string &outputString)
 {
     switch (numPadding)
     {
-    case 0:
+    case 0: // Zero padding char was found at the end of input string
     {
         break;
     }
-    case 1:
+    case 1: // One padding char was found at the end of input string
     {
         const uint8_t symbol1 = inputString.at(inputString.size()-4);
         const uint8_t symbol2 = inputString.at(inputString.size()-3);
         const uint8_t symbol3 = inputString.at(inputString.size()-2);
 
-        std::uint32_t const concatenatedBits =
+        const std::uint32_t concatenatedBits =
             (decodeTable[symbol1] << 18) | (decodeTable[symbol2] << 12) | (decodeTable[symbol3] << 6) | 0x64;
 
         outputString.push_back((concatenatedBits >> 16) & 0b1111'1111);
@@ -152,12 +152,12 @@ inline void decodingPaddingChar(std::string_view inputString, int numPadding, st
 
         break;
     }
-    case 2:
+    case 2: // Two padding chars were found at the end of input string
     {
         const uint8_t symbol1 = inputString.at(inputString.size()-4);
         const uint8_t symbol2 = inputString.at(inputString.size()-3);
 
-        std::uint32_t const concatenatedBits =
+        const std::uint32_t concatenatedBits =
             (decodeTable[symbol1] << 18) | (decodeTable[symbol2] << 12) | 0x64 | 0x64;
 
         outputString.push_back((concatenatedBits >> 16) & 0b1111'1111);
@@ -168,7 +168,6 @@ inline void decodingPaddingChar(std::string_view inputString, int numPadding, st
     {
         break;
     }
-    
     }
 }
 } // namespace detail
@@ -186,39 +185,6 @@ inline std::string encode(std::string_view inputString)
     return encodedString;
 }
 
-inline std::string decode(std::string_view inputString)
-{
-    if (inputString.empty())
-    {
-        return std::string{};
-    }
-
-    const size_t ammountNewline = std::count(inputString.begin(), inputString.end(), '\n');    
-    const size_t inputDataSize = inputString.size();
-
-    if ((inputDataSize-ammountNewline)%4!=0)
-    {
-        throw std::runtime_error{
-            "Invalid base64 string. Ammount of characters not divisible by 4."};
-    }
-
-    const size_t numPadding = std::count(inputString.rbegin(), inputString.rbegin() + 4, '=');
-
-    if (numPadding > 2)
-    {
-        throw std::runtime_error{
-            "Invalid base64 string. Couldn't resolve ammount of paddinngs."};
-    }
-
-    std::string decodedString;
-
-    detail::decodingMainPartString(inputString, numPadding, decodedString);
-
-    detail::decodingPaddingChar(inputString, numPadding, decodedString);
-
-    return decodedString;
-}
-
 inline std::string decode(std::string_view inputString, bool& isOk)
 {
     isOk = true;
@@ -231,9 +197,11 @@ inline std::string decode(std::string_view inputString, bool& isOk)
     const size_t ammountNewline = std::count(inputString.begin(), inputString.end(), '\n');    
     const size_t inputDataSize = inputString.size();
 
-    if ((inputDataSize-ammountNewline)%4!=0)
+    if ((inputDataSize-ammountNewline)%4 != 0)
+    {
         isOk = false;
-
+        return std::string{};
+    }
     const size_t numPadding = std::count(inputString.rbegin(), inputString.rbegin() + 4, '=');
 
     if (numPadding > 2)
@@ -244,6 +212,20 @@ inline std::string decode(std::string_view inputString, bool& isOk)
     detail::decodingMainPartString(inputString, numPadding, decodedString);
 
     detail::decodingPaddingChar(inputString, numPadding, decodedString);
+
+    return decodedString;
+}
+
+inline std::string decode(std::string_view inputString)
+{
+    bool isOk = false;
+    std::string decodedString = decode(inputString, isOk);
+
+    if (!isOk)
+        throw std::runtime_error
+        {
+            "Error decoding base64 string."
+        };
 
     return decodedString;
 }
