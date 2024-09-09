@@ -205,7 +205,10 @@ inline std::string decode(std::string_view inputString, bool& isOk)
     const size_t numPadding = std::count(inputString.rbegin(), inputString.rbegin() + 4, '=');
 
     if (numPadding > 2)
+    {
         isOk = false;
+        return std::string{};
+    }
 
     std::string decodedString;
 
