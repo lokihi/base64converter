@@ -23,7 +23,7 @@ base64::decode({"YmFzZTY0IGVuY29kZXI="})
 
 * Decoding with flag variable
 
-If an exception is caught, the value of the иoolean variable will be changed to false
+If an exception is caught, the value of the boolean variable will be changed to false
 ```
 bool flag;
 base64::decode({"YmFzZTY0IGVuY29kZXI="}, flag)
