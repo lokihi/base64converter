@@ -86,7 +86,7 @@ inline void encodingAddPaddingChar(std::string_view inputString, std::string &ou
     }
     case 2: // Two padding chars need to be added to encoded string
     {
-        const uint8_t symbol1 = inputString.at(inputString.size()-2);
+        const uint8_t symbol1 = inputString.at(inputString.size() - 2);
         const uint8_t symbol2 = inputString.back();
         outputString.push_back(encodeTable[(symbol1 >> 2) & 0b0011'1111]);
         outputString.push_back(encodeTable[(symbol1 << 4 | symbol2 >> 4) & 0b0011'1111]);
@@ -111,12 +111,12 @@ inline void decodingMainPartString(std::string_view inputString, size_t numPaddi
     uint8_t currentBlock[4];
     size_t counterBlock = 0;
 
-    size_t blocksAmmount = inputString.size() - (numPadding!=0)*4;
+    size_t blocksAmmount = inputString.size() - (numPadding != 0)*4;
 
     for (size_t i = 0; i < blocksAmmount; ++i)
     {   
         currentBlock[counterBlock] = *inputIterator++;
-        if (currentBlock[counterBlock] != '\n' && currentBlock[counterBlock]!='\r') 
+        if (currentBlock[counterBlock] != '\n' && currentBlock[counterBlock] != '\r') 
             counterBlock++;
         if (counterBlock == 4)
         {
@@ -140,9 +140,9 @@ inline void decodingPaddingChar(std::string_view inputString, size_t numPadding,
     }
     case 1: // One padding char was found at the end of input string
     {
-        const uint8_t symbol1 = inputString.at(inputString.size()-4);
-        const uint8_t symbol2 = inputString.at(inputString.size()-3);
-        const uint8_t symbol3 = inputString.at(inputString.size()-2);
+        const uint8_t symbol1 = inputString.at(inputString.size() - 4);
+        const uint8_t symbol2 = inputString.at(inputString.size() - 3);
+        const uint8_t symbol3 = inputString.at(inputString.size() - 2);
 
         const std::uint32_t concatenatedBits =
             (decodeTable[symbol1] << 18) | (decodeTable[symbol2] << 12) | (decodeTable[symbol3] << 6) | 0x64;
@@ -154,8 +154,8 @@ inline void decodingPaddingChar(std::string_view inputString, size_t numPadding,
     }
     case 2: // Two padding chars were found at the end of input string
     {
-        const uint8_t symbol1 = inputString.at(inputString.size()-4);
-        const uint8_t symbol2 = inputString.at(inputString.size()-3);
+        const uint8_t symbol1 = inputString.at(inputString.size() - 4);
+        const uint8_t symbol2 = inputString.at(inputString.size() - 3);
 
         const std::uint32_t concatenatedBits =
             (decodeTable[symbol1] << 18) | (decodeTable[symbol2] << 12) | 0x64 | 0x64;
@@ -187,28 +187,24 @@ inline std::string encode(std::string_view inputString)
 
 inline std::string decode(std::string_view inputString, bool& isOk)
 {
-    isOk = true;
+    isOk = false;
 
     if (inputString.empty())
     {
-        return std::string{};
+        isOk = true;
+        return std::string{""};
     }
 
     const size_t ammountNewline = std::count(inputString.begin(), inputString.end(), '\n');    
     const size_t inputDataSize = inputString.size();
 
     if ((inputDataSize-ammountNewline)%4 != 0)
-    {
-        isOk = false;
         return std::string{};
-    }
+    
     const size_t numPadding = std::count(inputString.rbegin(), inputString.rbegin() + 4, '=');
 
     if (numPadding > 2)
-    {
-        isOk = false;
         return std::string{};
-    }
 
     std::string decodedString;
 
@@ -216,6 +212,7 @@ inline std::string decode(std::string_view inputString, bool& isOk)
 
     detail::decodingPaddingChar(inputString, numPadding, decodedString);
 
+    isOk = true;
     return decodedString;
 }
 
