@@ -105,13 +105,13 @@ TEST(base64decode, FlagErrorNumPadding)
 TEST(base64decode, FlagCorrectAmmountOfSymbols)
 {
     bool flag;
-    const std::string decoded{base64::decode({"1234"},flag)};
+    const std::string decoded{base64::decode({"1234"}, flag)};
     ASSERT_TRUE(flag);
 }
 
 TEST(base64decode, FlagCorrectNumPadding)
 {
     bool flag;
-    const std::string decoded{base64::decode({"123456=="},flag)};
+    const std::string decoded{base64::decode({"123456=="}, flag)};
     ASSERT_TRUE(flag);
 }
